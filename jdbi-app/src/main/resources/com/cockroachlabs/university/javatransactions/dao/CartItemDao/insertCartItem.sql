@@ -2,11 +2,11 @@
 -- Insert
 --
 INSERT INTO cart_items (
-    username,
+    cart_id,
     item_id,
     quantity
 ) values (
- :username,
+ :cart_id,
  :item_id,
  :quantity
  );

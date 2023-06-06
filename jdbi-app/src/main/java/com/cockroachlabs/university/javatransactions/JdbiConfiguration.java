@@ -11,7 +11,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import com.cockroachlabs.university.javatransactions.dao.CartItemDao;
+import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItem;
 import com.cockroachlabs.university.javatransactions.dao.ItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
 import com.cockroachlabs.university.javatransactions.dao.ShoppingCartDao;
@@ -58,8 +58,8 @@ public class JdbiConfiguration {
     }
 
     @Bean
-    public CartItemDao cartDao(Jdbi jdbi){
-        return jdbi.onDemand(CartItemDao.class);
+    public ShoppingCartItem cartDao(Jdbi jdbi){
+        return jdbi.onDemand(ShoppingCartItem.class);
     }
     
 }

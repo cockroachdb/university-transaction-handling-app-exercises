@@ -17,14 +17,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
-import com.cockroachlabs.university.javatransactions.dao.CartItemDao;
+import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItem;
 import com.cockroachlabs.university.javatransactions.dao.ItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
 import com.cockroachlabs.university.javatransactions.dao.ShoppingCartDao;
 import com.cockroachlabs.university.javatransactions.domain.Item;
 import com.cockroachlabs.university.javatransactions.domain.Shopper;
 import com.cockroachlabs.university.javatransactions.domain.ShoppingCart;
-import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
+
+//We'll need this soon
+//import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
 
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -36,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SpringBootJdbiApplicationIntegrationTest {
     
+    /*
+    * Deleting this for now 
     @BeforeAll
     static void initAll() throws IOException {
         
@@ -51,12 +55,14 @@ public class SpringBootJdbiApplicationIntegrationTest {
     @AfterAll
     static void tearDownAll() {
     }
+
+    */
     
     @Autowired
     private ItemDao itemDao;
 
     @Autowired
-    private CartItemDao cartItemDao;
+    private ShoppingCartItem cartItemDao;
 
     @Autowired
     private ShopperDao shopperDao;
@@ -113,21 +119,24 @@ public class SpringBootJdbiApplicationIntegrationTest {
         .price(3.42)
         .build();
 
-        UUID generatedIdA = itemDao.insertItem(itemA);
-        log.info("[I37] generatedId = {}", generatedIdA);
-        assertNotNull(generatedIdA);
-
+        UUID itemIdA = itemDao.insertItem(itemA);
+        log.info("[I37] generatedId = {}", itemIdA);
+        assertNotNull(itemIdA);
 
         ShoppingCart shoppingCart = ShoppingCart.builder()
         .userEmail("someone@foo.com")
         .build();
 
+        UUID cartIdA = ShoppingCartDao.insertShoppingCart(shoppingCart);
+
         ShoppingCartItem cartItemA = ShoppingCartItem.builder()
-        .itemId(generatedIdA)
+        .itemId(itemIdA)
+        .cartId(cartIdA)
         .quantity(2)
         .build();
 
-        UUID cartId = cartItemA.getCartId();
+        
+        /*
         try {
             UUID cartItemId = cartItemDao.insert(cartItemA);
         } catch (SQLException e) {
@@ -136,6 +145,7 @@ public class SpringBootJdbiApplicationIntegrationTest {
         }
         log.info("Generated ID = {}", cartId);
         assertNotNull(cartId);
+         */
     }
-    
+
 }

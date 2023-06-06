@@ -4,16 +4,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-
-import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @UseClasspathSqlLocator
-public interface CartItemDao {
+public interface ShoppingCartItem {
 
     @SqlUpdate("insertCartItem")
     @GetGeneratedKeys
@@ -21,5 +21,10 @@ public interface CartItemDao {
 
     @SqlBatch("insertCartItem")
     @GetGeneratedKeys
-    List<UUID> bulkInsert(@BindBean List<ShoppingCartItem> cartItems)  throws SQLException;    
+    List<UUID> bulkInsert(@BindBean List<ShoppingCartItem> cartItems)  throws SQLException;
+    
+    @SqlQuery
+    ShoppingCartItem findCartItemById(@Bind("id") UUID item_id);
+
+    UUID getShoppingCartId();
 }

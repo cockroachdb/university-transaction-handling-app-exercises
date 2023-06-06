@@ -16,7 +16,11 @@ public interface ShoppingCartDao {
 
     @SqlUpdate("insertShoppingCart")
     @GetGeneratedKeys
-    UUID insertShoppingCart(@BindBean ShoppingCart shoppingCart);
+    static
+    UUID insertShoppingCart(@BindBean ShoppingCart shoppingCart) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insertShoppingCart'");
+    }
   
     @SqlQuery
     ShoppingCart findActiveCartByUser(@Bind("user_email") String userEmailString);
