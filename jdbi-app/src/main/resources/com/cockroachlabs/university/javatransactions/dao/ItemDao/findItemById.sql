@@ -4,9 +4,11 @@
 select
   id,
   name,
-  description
+  description,
+  quantity,
+  price
 from 
-  item
+  items
 where
   id = :id
 ;  

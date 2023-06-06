@@ -4,21 +4,17 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.logging.log4j.Logger;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.spi.JdbiPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import org.springframework.transaction.PlatformTransactionManager;
-
 import com.cockroachlabs.university.javatransactions.dao.CartItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ItemDao;
+import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
+import com.cockroachlabs.university.javatransactions.dao.ShoppingCartDao;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +45,16 @@ public class JdbiConfiguration {
     @Bean
     public ItemDao itemDao(Jdbi jdbi){
         return jdbi.onDemand(ItemDao.class);
+    }
+
+    @Bean
+    public ShopperDao shopperDao(Jdbi jdbi) {
+        return jdbi.onDemand(ShopperDao.class);
+    }
+
+    @Bean
+    public ShoppingCartDao shoppingCartDao(Jdbi jdbi) {
+        return jdbi.onDemand(ShoppingCartDao.class);
     }
 
     @Bean

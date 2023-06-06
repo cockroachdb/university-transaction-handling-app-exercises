@@ -7,23 +7,22 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cockroachlabs.university.javatransactions.dao.ItemDao;
 import com.cockroachlabs.university.javatransactions.dao.CartItemDao;
-
+import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
 import com.cockroachlabs.university.javatransactions.domain.Item;
 
 import io.github.resilience4j.retry.annotation.Retry;
 
-import com.cockroachlabs.university.javatransactions.domain.CartItem;
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
 
 @Component(value = "cartService")
 public class CartServiceImpl implements CartService{
 
-    private ItemDao itemDao;
+    private ShopperDao shopperDao;
     private CartItemDao cartItemDao;
 
-    public CartServiceImpl(ItemDao itemDao, CartItemDao cartItemDao){
-        this.itemDao = itemDao;
+    public CartServiceImpl(ShopperDao shopperDao, CartItemDao cartItemDao) {
+        this.shopperDao = shopperDao;
         this.cartItemDao = cartItemDao;
 
     }
@@ -31,14 +30,14 @@ public class CartServiceImpl implements CartService{
     @Override
     @Transactional
     @Retry(name = "transactionRetry")
-    public UUID addItemToCart(Item item, CartItem cartItem) throws SQLException{
+    public UUID addItemToCart(Item item, ShoppingCartItem cartItem) throws SQLException{
         
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
     @Override
     @Transactional
-    public UUID addItemToCartManualRetry(CartItem cartItem) throws SQLException{
+    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException{
         
         int maxRetries = 3;
         int retryDelay = 1000;
@@ -53,9 +52,9 @@ public class CartServiceImpl implements CartService{
                 if(retryCount < maxRetries) {
                     retryCount++;
                     int delay = (int)(retryDelay * Math.pow(2, retryCount));
-                    try{
+                    try {
                     Thread.sleep(delay);
-                    }catch(InterruptedException ex){
+                    } catch(InterruptedException ex) {
                         Thread.currentThread().interrupt();
                     }
                 } else {

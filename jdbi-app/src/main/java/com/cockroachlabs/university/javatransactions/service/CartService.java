@@ -4,13 +4,13 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 
-import com.cockroachlabs.university.javatransactions.domain.CartItem;
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
 import com.cockroachlabs.university.javatransactions.domain.Item;
 
 public interface CartService {
 
-    public UUID addItemToCart(Item item, CartItem cartItem) throws SQLException;
+    public UUID addItemToCart(Item item, ShoppingCartItem cartItem) throws SQLException;
 
-    public UUID addItemToCartManualRetry(CartItem cartItem) throws SQLException;
+    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException;
     
 }

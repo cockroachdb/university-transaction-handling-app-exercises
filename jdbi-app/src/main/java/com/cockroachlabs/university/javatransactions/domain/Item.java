@@ -8,7 +8,9 @@ import lombok.Data;
 @Builder
 @Data
 public class Item {
-    private UUID id;
+    private UUID item_id;
     private String name;
     private String description;
+    private int quantity;
+    private double price;
 }

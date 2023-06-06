@@ -16,17 +16,17 @@ import com.cockroachlabs.university.javatransactions.domain.Item;
 @UseClasspathSqlLocator
 public interface ItemDao {
 
-    @SqlUpdate("insert")
+    @SqlUpdate("insertItem")
     @GetGeneratedKeys
-    UUID insert(@BindBean Item item);
+    UUID insertItem(@BindBean Item item);
 
-    @SqlBatch("insert")
+    @SqlBatch("insertItem")
     @GetGeneratedKeys
     List<UUID> bulkInsert(@BindBean List<Item> items);
 
     @SqlQuery
-    Item findItemById(@Bind("id") UUID id);
-    
+    Item findItemById(@Bind("item_id") UUID item_id);
+
     @SqlQuery
-    List<Item> findItemByName(@Bind("name") String name);
+    Item findItemsByName(@Bind("name") List<Item> items);
 }

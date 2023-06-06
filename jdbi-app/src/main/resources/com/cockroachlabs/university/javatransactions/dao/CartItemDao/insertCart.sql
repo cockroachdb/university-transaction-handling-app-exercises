@@ -1,7 +1,8 @@
 --
 -- Insert
 --
-insert into cart(username,item,quantity) values (
- :username,
- :item,
- :quantity );
+insert into cart(user_email) values (
+ :user_email
+ )
+ RETURNING
+ id;

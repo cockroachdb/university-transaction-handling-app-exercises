@@ -2,12 +2,11 @@
 -- findCartByUser.sql
 --
 select
-  id,
-  username,
-  item, 
-  quantity
+  cart_id,
+  user_email,
+  purchased_at
 from 
   cart
 where
-  username = :username
+  user_email = :user_email
 ;  

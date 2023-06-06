@@ -1,7 +1,5 @@
 package com.cockroachlabs.university.javatransactions.domain;
 
-import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,6 +1,15 @@
 --
 -- Insert
 --
-insert into item(name,description) values (
+INSERT INTO items(
+    name,
+    description,
+    quantity,
+    price
+) values (
  :name,
- :description );
+ :description,
+ :quantity,
+ :price
+ )
+ RETURNING item_id;

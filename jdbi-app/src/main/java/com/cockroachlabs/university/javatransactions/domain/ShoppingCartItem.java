@@ -7,9 +7,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CartItem {
+public class ShoppingCartItem {
     private UUID id;
-    private String username;
-    private UUID item; 
+    private UUID cartId;
+    private UUID itemId;
     private int quantity;
 }

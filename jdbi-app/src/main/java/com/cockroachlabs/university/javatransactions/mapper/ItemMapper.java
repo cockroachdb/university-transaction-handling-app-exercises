@@ -16,9 +16,11 @@ public class ItemMapper implements RowMapper<Item>{
     @Override
     public Item map(ResultSet rs, StatementContext ctx) throws SQLException {
         return Item.builder()
-            .id(UUID.fromString(rs.getString("id")))
+            .item_id(UUID.fromString(rs.getString("item_id")))
             .name(rs.getString("name"))
             .description(rs.getString("description"))
+            .quantity(rs.getInt("quantity"))
+            .price(rs.getDouble("price"))
             .build();
     }
 

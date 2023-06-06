@@ -1,1 +1,0 @@
-### Using JDBI with CockroachDB
