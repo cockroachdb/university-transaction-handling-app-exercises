@@ -1,5 +1,5 @@
 --
--- Insert Shopping Cart
+-- insertShoppingCart
 --
 --
 INSERT INTO shopping_carts (user_email) VALUES (

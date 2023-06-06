@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItem;
+import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
 import com.cockroachlabs.university.javatransactions.domain.Item;
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
 
 import io.github.resilience4j.retry.annotation.Retry;
 
@@ -17,14 +18,14 @@ import io.github.resilience4j.retry.annotation.Retry;
 public class CartServiceImpl implements CartService{
 
     private ShopperDao shopperDao;
-    private ShoppingCartItem cartItemDao;
+    private ShoppingCartItemDao cartItemDao;
 
-    public CartServiceImpl(ShopperDao shopperDao, ShoppingCartItem cartItemDao) {
+    public CartServiceImpl(ShopperDao shopperDao, ShoppingCartItemDao cartItemDao) {
         this.shopperDao = shopperDao;
         this.cartItemDao = cartItemDao;
 
     }
-/*
+
     @Override
     @Transactional
     @Retry(name = "transactionRetry")
@@ -32,12 +33,11 @@ public class CartServiceImpl implements CartService{
         
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
-*/
 
     @Override
     @Transactional
-    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException {
-        
+    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException{
+
         int maxRetries = 3;
         int retryDelay = 1000;
         int retryCount = 0;
@@ -45,8 +45,8 @@ public class CartServiceImpl implements CartService{
 
         while (retryCount < maxRetries) {
             try {
-                cartItemDao.insert(cartItem);
-            } catch (SQLException exception){
+                cartItemDao.insertCartItem(cartItem);
+            } catch (SQLException exception) {
                 
                 if(retryCount < maxRetries) {
                     retryCount++;
@@ -65,20 +65,6 @@ public class CartServiceImpl implements CartService{
 
         return cartItemId;
 
-    }
- 
-    @Override
-    public UUID addItemToCart(Item item, com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem cartItem)
-            throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addItemToCart'");
-    }
-
-    @Override
-    public UUID addItemToCartManualRetry(com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem cartItem)
-            throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addItemToCartManualRetry'");
     }
     
 }

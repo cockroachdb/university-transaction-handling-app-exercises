@@ -10,21 +10,22 @@ import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
+
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @UseClasspathSqlLocator
-public interface ShoppingCartItem {
+public interface ShoppingCartItemDao {
 
     @SqlUpdate("insertCartItem")
     @GetGeneratedKeys
-    UUID insert(@BindBean ShoppingCartItem cartItem) throws SQLException;
+    UUID insertCartItem(@BindBean ShoppingCartItem cartItem) throws SQLException;
 
     @SqlBatch("insertCartItem")
     @GetGeneratedKeys
-    List<UUID> bulkInsert(@BindBean List<ShoppingCartItem> cartItems)  throws SQLException;
+    List<UUID> insertCartItem(@BindBean List<ShoppingCartItem> cartItems)  throws SQLException;
     
     @SqlQuery
-    ShoppingCartItem findCartItemById(@Bind("id") UUID item_id);
-
-    UUID getShoppingCartId();
+    ShoppingCartItemDao findCartItemById(@Bind("id") UUID item_id);
 }

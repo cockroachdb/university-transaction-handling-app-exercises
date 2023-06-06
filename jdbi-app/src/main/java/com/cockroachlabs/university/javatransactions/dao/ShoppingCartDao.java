@@ -1,5 +1,6 @@
 package com.cockroachlabs.university.javatransactions.dao;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -17,11 +18,8 @@ public interface ShoppingCartDao {
     @SqlUpdate("insertShoppingCart")
     @GetGeneratedKeys
     static
-    UUID insertShoppingCart(@BindBean ShoppingCart shoppingCart) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'insertShoppingCart'");
-    }
+    UUID insertShoppingCart(@Bind("user_email") String userEmailString) throws SQLException;
   
     @SqlQuery
-    ShoppingCart findActiveCartByUser(@Bind("user_email") String userEmailString);
+    ShoppingCart findActiveCartByUser(@Bind("user_email") String userEmailString) throws SQLException;
 }
