@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService{
 
     @Override
     @Transactional
-    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException{
+    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException {
 
         int maxRetries = 3;
         int retryDelay = 1000;

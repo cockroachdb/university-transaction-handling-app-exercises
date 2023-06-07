@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringBootJdbiApplicationIntegrationTest {
     
     /*
-    * Deleting this for now 
+     * Deleting this for now 
     @BeforeAll
     static void initAll() throws IOException {
         
@@ -89,7 +89,6 @@ public class SpringBootJdbiApplicationIntegrationTest {
         .build();
 
         int shopperInserted = shopperDao.insertShopper(shopperA);
-
 
         assertEquals(shopperInserted, 1);
 
