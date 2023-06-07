@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
 import com.cockroachlabs.university.javatransactions.domain.Item;
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCart;
 import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
 
 import io.github.resilience4j.retry.annotation.Retry;
@@ -37,6 +38,7 @@ public class CartServiceImpl implements CartService{
     @Override
     @Transactional
     public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException {
+        System.out.println("addItemToCartManualRetry(ShoppingCartItem cartItem) RUNNING");
 
         int maxRetries = 3;
         int retryDelay = 1000;
@@ -45,22 +47,27 @@ public class CartServiceImpl implements CartService{
 
         while (retryCount < maxRetries) {
             try {
+                System.out.println("RUNNING count number " + retryCount);
                 cartItemDao.insertCartItem(cartItem);
+                break;
+                // Thread.sleep(2000);
+                // itemDao.updateItemQuantity(itemId, quantity);
             } catch (SQLException exception) {
-                
+                System.out.println("Exception caught during count number " + retryCount);
+
                 if(retryCount < maxRetries) {
+                    System.out.println("Retry count " + retryCount);
                     retryCount++;
                     int delay = (int)(retryDelay * Math.pow(2, retryCount));
                     try {
-                    Thread.sleep(delay);
+                        Thread.sleep(delay);
                     } catch(InterruptedException ex) {
                         Thread.currentThread().interrupt();
                     }
                 } else {
                     throw exception;
                 }
-
-            }
+            } 
         }
 
         return cartItemId;

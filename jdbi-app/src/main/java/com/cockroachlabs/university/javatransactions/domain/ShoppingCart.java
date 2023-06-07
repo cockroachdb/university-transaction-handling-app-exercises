@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ShoppingCart {
-    private UUID cartId;
-    private String userEmail;
-    private Date purchasedAt;
+    private UUID cart_id;
+    private String user_email;
+    private Date purchased_at;
 }

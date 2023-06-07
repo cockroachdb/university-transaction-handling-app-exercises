@@ -5,6 +5,7 @@ import java.util.UUID;
 
 
 import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
+import com.cockroachlabs.university.javatransactions.domain.ShoppingCart;
 import com.cockroachlabs.university.javatransactions.domain.Item;
 
 public interface CartService {

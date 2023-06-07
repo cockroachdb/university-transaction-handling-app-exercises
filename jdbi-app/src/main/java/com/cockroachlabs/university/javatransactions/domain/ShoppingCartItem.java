@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 public class ShoppingCartItem {
     private UUID id;
-    private UUID cartId;
-    private UUID itemId;
+    private UUID cart_id;
+    private UUID item_id;
     private int quantity;
 }

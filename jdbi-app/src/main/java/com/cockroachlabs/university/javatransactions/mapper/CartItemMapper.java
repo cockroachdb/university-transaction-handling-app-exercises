@@ -18,8 +18,8 @@ public class CartItemMapper implements RowMapper<ShoppingCartItem>{
     public ShoppingCartItem map(ResultSet rs, StatementContext ctx) throws SQLException {
         return ShoppingCartItem.builder()
             .id(UUID.fromString(rs.getString("id")))
-            .cartId(UUID.fromString(rs.getString("cart_id")))
-            .itemId(UUID.fromString(rs.getString("item_id")))
+            .cart_id(UUID.fromString(rs.getString("cart_id")))
+            .item_id(UUID.fromString(rs.getString("item_id")))
             .quantity(rs.getInt("quantity"))
             .build();
 

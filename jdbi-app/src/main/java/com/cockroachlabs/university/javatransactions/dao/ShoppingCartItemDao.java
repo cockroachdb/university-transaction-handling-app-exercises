@@ -27,5 +27,5 @@ public interface ShoppingCartItemDao {
     List<UUID> insertCartItem(@BindBean List<ShoppingCartItem> cartItems)  throws SQLException;
     
     @SqlQuery
-    ShoppingCartItemDao findCartItemById(@Bind("id") UUID item_id);
+    ShoppingCartItemDao findCartItemById(@Bind("cart_id") UUID cartId);
 }

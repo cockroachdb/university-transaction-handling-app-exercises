@@ -17,9 +17,9 @@ public class ShoppingCartMapper implements RowMapper<ShoppingCart>{
     @Override
     public ShoppingCart map(ResultSet rs, StatementContext ctx) throws SQLException {
         return ShoppingCart.builder()
-            .cartId(UUID.fromString(rs.getString("cart_id")))
-            .userEmail(rs.getString("user_email"))
-            .purchasedAt(rs.getDate("purchased_at"))
+            .cart_id(UUID.fromString(rs.getString("cart_id")))
+            .user_email(rs.getString("user_email"))
+            .purchased_at(rs.getDate("purchased_at"))
             .build();
     }
 
