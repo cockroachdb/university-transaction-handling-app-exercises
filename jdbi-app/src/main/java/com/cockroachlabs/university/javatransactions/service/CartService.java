@@ -10,8 +10,8 @@ import com.cockroachlabs.university.javatransactions.domain.Item;
 
 public interface CartService {
 
-    public UUID addItemToCart(Item item, ShoppingCartItem cartItem) throws SQLException;
+    public UUID addItemToCart(UUID cartId, UUID itemId) throws SQLException;
 
-    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException;
+    public UUID addItemToCartManualRetry(UUID cartId, UUID itemId, int quantity) throws SQLException;
     
 }

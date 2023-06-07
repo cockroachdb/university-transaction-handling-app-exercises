@@ -30,14 +30,14 @@ public class CartServiceImpl implements CartService{
     @Override
     @Transactional
     @Retry(name = "transactionRetry")
-    public UUID addItemToCart(Item item, ShoppingCartItem cartItem) throws SQLException {
+    public UUID addItemToCart(UUID itemId, UUID cartId) throws SQLException {
         
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
     @Override
     @Transactional
-    public UUID addItemToCartManualRetry(ShoppingCartItem cartItem) throws SQLException {
+    public UUID addItemToCartManualRetry(UUID cartId, UUID itemId, int quantity) throws SQLException {
         System.out.println("addItemToCartManualRetry(ShoppingCartItem cartItem) RUNNING");
 
         int maxRetries = 3;
@@ -48,10 +48,20 @@ public class CartServiceImpl implements CartService{
         while (retryCount < maxRetries) {
             try {
                 System.out.println("RUNNING count number " + retryCount);
-                cartItemDao.insertCartItem(cartItem);
+                
+                cartItemDao.updateItemQuantity(itemId, quantity);
+
+                // Sleep for two seconds to make it easier to trigger contention
+                // This wouldn't be present in production code
+                try {
+                    Thread.sleep(2000);
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+      
+
+                cartItemDao.insertCartItem(cartId, itemId, quantity);
                 break;
-                // Thread.sleep(2000);
-                // itemDao.updateItemQuantity(itemId, quantity);
             } catch (SQLException exception) {
                 System.out.println("Exception caught during count number " + retryCount);
 

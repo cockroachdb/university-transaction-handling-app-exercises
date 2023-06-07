@@ -242,15 +242,16 @@ public class SpringBootJdbiApplicationIntegrationTest {
             latch.await();
             
             System.out.println("Checkpoint 2b");
-
+/*
+ * No longer needed
             ShoppingCartItem cartItemA = ShoppingCartItem.builder()
                 .item_id(itemIdA)
                 .cart_id(shopperOneCart)
                 .quantity(2)
                 .build();
-
+ */
             synchronized (this) {
-                cartItemId = cartService.addItemToCartManualRetry(cartItemA);
+                cartItemId = cartService.addItemToCartManualRetry(shopperOneCart, itemIdA, 2);
             }
 
             return cartItemId;
@@ -263,15 +264,15 @@ public class SpringBootJdbiApplicationIntegrationTest {
             latch.await();
             
             System.out.println("Checkpoint 2b");
-
+/*
             ShoppingCartItem cartItemA = ShoppingCartItem.builder()
                 .item_id(itemIdA)
                 .cart_id(shopperTwoCart)
                 .quantity(2)
                 .build();
-
+*/
             synchronized (this) {
-                cartItemId = cartService.addItemToCartManualRetry(cartItemA);
+                cartItemId = cartService.addItemToCartManualRetry(shopperTwoCart, itemIdA, 2);
             }
 
             return cartItemId;
