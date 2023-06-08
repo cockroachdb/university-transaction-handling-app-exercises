@@ -4,14 +4,12 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
-
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ShopperDao;
-import com.cockroachlabs.university.javatransactions.domain.Item;
-import com.cockroachlabs.university.javatransactions.domain.ShoppingCart;
-import com.cockroachlabs.university.javatransactions.domain.ShoppingCartItem;
+import java.time.LocalDateTime;    
 
 import io.github.resilience4j.retry.annotation.Retry;
 
@@ -28,7 +26,7 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Retry(name = "transactionRetry")
     public UUID addItemToCart(UUID itemId, UUID cartId) throws SQLException {
         
@@ -36,7 +34,7 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UUID addItemToCartManualRetry(UUID cartId, UUID itemId, int quantity) throws SQLException {
         System.out.println("addItemToCartManualRetry(ShoppingCartItem cartItem) RUNNING");
 
@@ -47,21 +45,26 @@ public class CartServiceImpl implements CartService{
 
         while (retryCount < maxRetries) {
             try {
-                System.out.println("RUNNING count number " + retryCount);
+                LocalDateTime startTime = LocalDateTime.now();
                 
                 cartItemDao.updateItemQuantity(itemId, quantity);
-
-                // Sleep for two seconds to make it easier to trigger contention
+                System.out.println("Updated item quantity at retry # " + retryCount + " at time: " + startTime);
+                System.out.println("UPDATE ITEMS NOW!!!");
+                
+                // Sleep for ten seconds to make it easier to trigger contention
                 // This wouldn't be present in production code
-                try {
-                    Thread.sleep(2000);
-                } catch(InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-      
-
+                //try {
+                //    Thread.sleep(2000);
+                //} catch (InterruptedException ex) {
+                //    Thread.currentThread().interrupt();
+                //}
+                
+                LocalDateTime endTime = LocalDateTime.now();
+                System.out.println("Inserting cart item at retry # " + retryCount + " at time: " + endTime);
+                System.out.println("TRANSACTION IS NOW ENDING!!!");
                 cartItemDao.insertCartItem(cartId, itemId, quantity);
                 break;
+                
             } catch (SQLException exception) {
                 System.out.println("Exception caught during count number " + retryCount);
 
@@ -79,7 +82,7 @@ public class CartServiceImpl implements CartService{
                 }
             } 
         }
-
+        System.out.println("Success!");
         return cartItemId;
 
     }
