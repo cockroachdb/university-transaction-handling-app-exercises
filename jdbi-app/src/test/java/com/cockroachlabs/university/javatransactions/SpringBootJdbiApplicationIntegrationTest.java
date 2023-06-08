@@ -4,11 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.SQLException;
-import java.util.Random;
 import java.util.UUID;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -25,8 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
 
 import com.cockroachlabs.university.javatransactions.dao.ShoppingCartItemDao;
 import com.cockroachlabs.university.javatransactions.dao.ItemDao;
@@ -62,26 +56,6 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest(classes = {SpringBootJdbiApplication.class, JdbiConfiguration.class})
 @Slf4j
 public class SpringBootJdbiApplicationIntegrationTest {
-    
-    /*
-     * Deleting this for now 
-    @BeforeAll
-    static void initAll() throws IOException {
-        
-        Jdbi jdbi = Jdbi.create("jdbc:postgresql://honest-mare-2968.g8z.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&password=5jMhbIoPz7wcK53dHfT3ZQ&user=kiki");
-        Path filePath = Path.of("src/test/resources/schema.sql");
-        String script = Files.readString(filePath);
-        jdbi.useHandle( handle -> {
-            handle.createScript(script).execute();
-        });
-        
-    }
-
-    @AfterAll
-    static void tearDownAll() {
-    }
-
-    */
     
     @Autowired
     private ItemDao itemDao;
@@ -151,8 +125,10 @@ public class SpringBootJdbiApplicationIntegrationTest {
     @Test
     public void insertNewShopper() throws SQLException{
         
+        String shopperEmail = "somebody@fake.com";
+
         Shopper shopperA = Shopper.builder()
-        .email("somebody@fake.com")
+        .email(shopperEmail)
         .name("Alan Alda")
         .address("123 Fake Street, New York, NY 10010")
         .build();
@@ -160,6 +136,9 @@ public class SpringBootJdbiApplicationIntegrationTest {
         int shopperInserted = shopperDao.insertShopper(shopperA);
 
         assertEquals(shopperInserted, 1);
+
+        // cleanup
+        shopperDao.deleteShopper(shopperEmail);
 
      }
  
@@ -176,6 +155,9 @@ public class SpringBootJdbiApplicationIntegrationTest {
         UUID generatedId = itemDao.insertItem(item);
         log.info("[I37] generatedId = {}", generatedId);
         assertNotNull(generatedId);
+
+        itemDao.deleteItem(generatedId);
+
     }
 
     @Test
@@ -200,7 +182,7 @@ public class SpringBootJdbiApplicationIntegrationTest {
         .address("123 Fake Street, New York, NY 10010")
         .build();
 
-        int shopperInserted = shopperDao.insertShopper(shopperB);
+        shopperDao.insertShopper(shopperB);
 
         ShoppingCart shoppingCart = ShoppingCart.builder()
         .user_email(anEmail)
@@ -224,12 +206,15 @@ public class SpringBootJdbiApplicationIntegrationTest {
         }
         log.info("Generated ID = {}", cartItemId);
         assertNotNull(cartItemId);
+
+        // cleanup
+        cartItemDao.deleteCartItem(cartItemId);
+        shoppingCartDao.deleteShoppingCart(cartIdA);
+        shopperDao.deleteShopper(anEmail);
+        itemDao.deleteItem(itemIdA);
         
     }
 
-     
-/*
- * Removing this test temporarily; seems to be causing build failure & it's no longer essential
     @Test
     public void testSerializableIsolation() throws SQLException {
         System.out.println("Checkpoint 1");
@@ -322,9 +307,14 @@ public class SpringBootJdbiApplicationIntegrationTest {
         Future<UUID> resultA = executor.submit(userOneAddItemToCart);
         Future<UUID> resultB = executor.submit(userTwoAddItemToCart);
 
+        UUID cartItemAId = null;
+        UUID cartItemBId = null;
+
+
          try {
-            resultA.get();
-            resultB.get();
+
+            cartItemAId = resultA.get();
+            cartItemBId = resultB.get();
 
         } catch (InterruptedException e) {
             fail("should not throw {} ", e);
@@ -337,7 +327,17 @@ public class SpringBootJdbiApplicationIntegrationTest {
         
         executor.shutdown();
 
+        // cleanup
+        cartItemDao.deleteCartItem(cartItemAId);
+        cartItemDao.deleteCartItem(cartItemBId);
+        shoppingCartDao.deleteShoppingCart(shopperOneCart);
+        shoppingCartDao.deleteShoppingCart(shopperTwoCart);
+        shopperDao.deleteShopper(shopperOneEmail);
+        shopperDao.deleteShopper(shopperTwoEmail);
+        itemDao.deleteItem(itemIdA);
+        
+
     }
-*/
+
 
 }

@@ -29,4 +29,8 @@ public interface ItemDao {
 
     @SqlQuery
     Item findItemsByName(@Bind("name") List<Item> items);
+
+    @SqlUpdate("deleteItem")
+    int deleteItem(@Bind("item_id") UUID itemId);
+
 }

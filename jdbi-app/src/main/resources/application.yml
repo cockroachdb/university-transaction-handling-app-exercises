@@ -3,9 +3,6 @@
 #   - crdb-pooling-basic - CockroachDB database with HikariCP. Loads configuration from application-crdb-pooling-basic.properties
 
 spring:
-   profiles:
-      active: crdb-pooling-basic
-
 resilience4j:
   retry:
   instances:

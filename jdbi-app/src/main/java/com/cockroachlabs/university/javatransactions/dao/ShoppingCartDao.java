@@ -20,4 +20,7 @@ public interface ShoppingCartDao {
   
     @SqlQuery
     ShoppingCart findActiveCartByUser(@Bind("user_email") String userEmailString) throws SQLException;
+
+    @SqlUpdate("deleteShoppingCart")
+    int deleteShoppingCart(@Bind("cart_id") UUID cartId) throws SQLException;
 }

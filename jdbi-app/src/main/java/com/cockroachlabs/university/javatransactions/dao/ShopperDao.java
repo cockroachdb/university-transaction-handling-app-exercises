@@ -18,4 +18,7 @@ public interface ShopperDao {
     @SqlQuery
     Shopper findShopperByEmail(@Bind("email") String email) throws SQLException;
 
+    @SqlUpdate("deleteShopper")
+    int deleteShopper(@Bind("email") String email) throws SQLException;
+
 }
