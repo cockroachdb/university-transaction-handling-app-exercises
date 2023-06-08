@@ -3,4 +3,5 @@
 --
 
 DELETE FROM cart_items
-      WHERE id = :id;
+      WHERE id = :id
+;

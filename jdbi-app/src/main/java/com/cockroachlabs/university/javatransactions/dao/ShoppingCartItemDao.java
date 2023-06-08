@@ -37,5 +37,6 @@ public interface ShoppingCartItemDao {
     int updateItemQuantity(@Bind("item_id") UUID itemId, @Bind("amount") int amount);
 
     @SqlUpdate("deleteCartItem")
-    int deleteCartItem(@Bind("item_id") UUID itemId);
+    int deleteCartItem(@Bind("id") UUID itemId);
+    
 }
