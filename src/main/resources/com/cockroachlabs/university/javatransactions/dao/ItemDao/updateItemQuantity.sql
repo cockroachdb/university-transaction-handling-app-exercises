@@ -7,4 +7,3 @@ UPDATE items
  WHERE item_id = :item_id
   AND quantity >= :amount
 ;
-   -- AND quantity >= :amount;
