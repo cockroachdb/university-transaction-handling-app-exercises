@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JdbiConfiguration {
     @Bean
-    public Jdbi jdbi(DataSource ds,List<JdbiPlugin> jdbiPlugins, List<RowMapper<?>> rowMappers) {        
+    public Jdbi jdbi(DataSource ds, List<JdbiPlugin> jdbiPlugins, List<RowMapper<?>> rowMappers) {        
         TransactionAwareDataSourceProxy proxy = new TransactionAwareDataSourceProxy(ds);        
         Jdbi jdbi = Jdbi.create(proxy);
         
