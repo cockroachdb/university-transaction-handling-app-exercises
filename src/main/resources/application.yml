@@ -5,14 +5,3 @@
 spring:
    profiles:
       active: crdb-pooling-basic
-
-resilience4j:
-  retry:
-  instances:
-    transactionRetry:
-      max-attempts: 3
-      wait-duration: 5s
-      enable-exponential-backoff: true
-      exponential-backoff-multiplier: 2
-      retry-exceptions:
-        - java.sql.SQLException

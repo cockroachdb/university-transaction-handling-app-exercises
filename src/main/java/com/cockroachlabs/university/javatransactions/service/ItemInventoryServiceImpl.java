@@ -3,6 +3,7 @@ package com.cockroachlabs.university.javatransactions.service;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.postgresql.util.PSQLException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,48 +20,55 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
         this.itemDao = itemDao;
     }
 
-    @Override
     @Transactional
-    @Retry(name = "transactionRetry")
-    public void updateItemInventoryA(UUID itemId, int quantity) throws SQLException {
-        
-        throw new UnsupportedOperationException("This method is not implemented yet");
+    public void updateItemInventoryTxn(UUID itemId, int quantity) throws SQLException {
+        itemDao.updateItemInventory(itemId, quantity);
     }
 
     @Override
-    @Transactional
-    public void updateItemInventoryB(UUID itemId, int quantity) throws SQLException {
+    public void updateItemInventory(UUID itemId, int quantity) throws SQLException {
         System.out.println("updateItemInventory(UUID itemId, int quantity) RUNNING");
 
         int maxRetries = 3;
         int retryDelay = 1000;
         int retryCount = 0;
 
-        while (retryCount < maxRetries) {
+        boolean retryTransaction = true;
+
+        while (retryTransaction) {
             try {
+                System.out.println(String.format("RUNNING UPDATE ITEM INVENTORY COUNT = %d", retryCount));
+                // to ensure a new transaction is created on every retry
+                this.updateItemInventoryTxn(itemId, quantity);
+                retryTransaction = false;
+            } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException exception) {
 
-                System.out.println(String.format("RUNNING UPDATE ITEM INVENTORY COUNT = {}", retryCount));
-                itemDao.updateItemInventory(itemId, quantity);
-                 
-                break;
-            } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException 
-            | org.jdbi.v3.core.transaction.UnableToManipulateTransactionIsolationLevelException exception) {
-                System.out.println("Exception caught during count number " + retryCount);
+                Throwable cause = exception.getCause();
 
-                if(retryCount < maxRetries) {
-                    System.out.println("Retry count " + retryCount);
-                    retryCount++;
-                    int delay = (int)(retryDelay * Math.pow(2, retryCount));
-                    try {
-                        Thread.sleep(delay);
-                    } catch(InterruptedException ex) {
-                        Thread.currentThread().interrupt();
+                System.out.println(String.format("THIS IS THE CAUSE  %s", cause.toString()));
+
+                if (cause instanceof PSQLException) {
+                    PSQLException psqlException = (PSQLException) cause;
+                    System.out.println(String.format("THIS IS THE SQL State  %s", psqlException.getSQLState()));
+
+                    if ("40001".equals(psqlException.getSQLState())) {
+                        retryCount++;
+                        int delay = (int) (retryDelay * Math.pow(2, retryCount));
+                        try {
+                            Thread.sleep(delay);
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+                        if (retryCount > maxRetries) {
+                            throw new RuntimeException("Max retries exceeded", exception);
+                        }
+                        continue;
                     }
-                } else {
-                    throw exception;
                 }
-            } 
+                throw exception;
+            }
+            
         }
     }
-    
+
 }

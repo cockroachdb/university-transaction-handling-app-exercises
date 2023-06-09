@@ -60,7 +60,7 @@ public class SpringBootJdbiApplicationIntegrationTest {
         .build();
          
         UUID generatedId = itemDao.insertItem(item);
-        log.info("[RUNNING TEST - givenNewItem_whenInsertNewItem_thenSuccess] generatedId = {}", generatedId);
+        log.info("[RUNNING TEST - givenNewItem_whenInsertNewItem_thenSuccess] generatedId = %s", generatedId);
         assertNotNull(generatedId);
     }
 
@@ -81,7 +81,7 @@ public class SpringBootJdbiApplicationIntegrationTest {
             itemDao.updateItemInventory(generatedId, 3);
         } catch (SQLException e) {
             e.printStackTrace();
-            fail(String.format("Should not reach exception: {} ", e.getMessage()));
+            fail(String.format("Should not reach exception: %s ", e.getMessage()));
         }
 
     }
@@ -99,30 +99,45 @@ public class SpringBootJdbiApplicationIntegrationTest {
 
         assertNotNull(generatedId);
 
+        // A call to update the item inventory. This calls the service method that
+        // reads the item row, then pauses for a duration, then tries to update the 
+        // item row
         Callable<Boolean> updateItemInventory = () -> {
             log.info("update the item inventory, read then updated");
-            itemInventoryService.updateItemInventoryB(generatedId, 3);
+            itemInventoryService.updateItemInventory(generatedId, 3);
             log.info("update completed!");
             return true;
         };
 
+        // A call that directly updates an item's quantity using the dao. It happens in 
+        // a single transaction. 
         Callable<Boolean> updateItem = () -> {
-            log.info("Wait a bit before updating the item quantity ");
-            Thread.sleep(2000);
+            log.info("pause then update the item quantity ");
+            // we pause to ensure we are in the middle of the update inventory transaction
+            Thread.sleep(1000);
+            // updates the quantity in a single transaction
             itemDao.updateItemQuantity(generatedId, 2);
             log.info("item quantity updated! ");
             return true;
         };
 
         ExecutorService executor = Executors.newCachedThreadPool();
-
+        
+        // We execute both calls in parallel, this is why the pause is necessary on "updateItem"
         Future<Boolean> a = executor.submit(updateItemInventory);
         Future<Boolean> b = executor.submit(updateItem);
 
         try {
-            a.get();
-            //itemInventoryService.updateItemInventoryB(generatedId, 3);
-            b.get();
+            Boolean updatedInventory = a.get();
+            Boolean updatedItemQuanity = b.get();
+
+            assertTrue(updatedInventory, "successfully updated inventory");
+            assertTrue(updatedItemQuanity, "successfully updated the item quantity");
+
+            int updatedQuanity = itemDao.findItemById(generatedId).getQuantity();
+            log.info(String.format("Updated item quantity is: %d", updatedQuanity));
+
+            assertTrue(itemDao.findItemById(generatedId).getQuantity() == 195);
 
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
@@ -133,117 +148,5 @@ public class SpringBootJdbiApplicationIntegrationTest {
         }
 
     } 
-     
-/*
- * Removing this test temporarily; seems to be causing build failure & it's no longer essential
-    @Test
-    public void testSerializableIsolation() throws SQLException {
-        System.out.println("Checkpoint 1");
-
-        // Build a single item for both users to add to their cart
-        Item itemA = Item.builder().name("foof")
-            .description("fang")
-            .quantity(200)
-            .price(3.42)
-            .build();
-
-        UUID itemIdA = itemDao.insertItem(itemA);
-        log.info("[I37] generatedId = {}", itemIdA);
-        assertNotNull(itemIdA);
-
-        // Build shopper one
-        String shopperOneEmail = "shopper@one.com";
-        Shopper shopperOne = Shopper.builder()
-        .email(shopperOneEmail)
-        .name("Betty")          
-        .address("123 Fake Street, New York, NY 10010")
-        .build();
-
-        int shopperOneInserted = shopperDao.insertShopper(shopperOne);
-
-        // Build shopper two
-        String shopperTwoEmail = "shopper@two.com";
-        Shopper shopperTwo = Shopper.builder()
-        .email(shopperTwoEmail)
-        .name("Betty Boop")          
-        .address("123 Fake Street, New York, NY 10010")
-        .build();
-
-        int shopperTwoInserted = shopperDao.insertShopper(shopperTwo);
-
-        // Build carts for each shopper
-
-        // Cart for shopper one
-        ShoppingCart shoppingCartOne = ShoppingCart.builder()
-        .user_email(shopperOneEmail)
-        .build();
-
-        // Cart for shopper one
-        UUID shopperOneCart = shoppingCartDao.insertShoppingCart(shopperOneEmail);
-
-         // Cart for shopper two
-        UUID shopperTwoCart = shoppingCartDao.insertShoppingCart(shopperTwoEmail);
-       
-        // Run the following twice in parallel, and synchronize
-        // Follows the SQL example from the previous exercise
-        ExecutorService executor = Executors.newCachedThreadPool();
-        CountDownLatch latch = new CountDownLatch(2);
-        
-        System.out.println("Checkpoint 2");
-        
-        // NOTE: boiler plate for test; skip 
-        CartService cartService = new CartServiceImpl(shopperDao, cartItemDao);
-
-        Callable<UUID> userOneAddItemToCart = () -> {
-            UUID cartItemId = null;
-            
-            latch.countDown();
-            latch.await();
-            
-            System.out.println("Checkpoint 2b");
-            synchronized (this) {
-                cartItemId = cartService.addItemToCartManualRetry(shopperOneCart, itemIdA, 2);
-            }
-
-            return cartItemId;
-        };
-
-        Callable<UUID> userTwoAddItemToCart = () -> {
-            UUID cartItemId = null;
-
-            latch.countDown();
-            latch.await();
-            
-            System.out.println("Checkpoint 2b");
-
-            synchronized (this) {
-                cartItemId = cartService.addItemToCartManualRetry(shopperTwoCart, itemIdA, 2);
-            }
-
-            return cartItemId;
-        };
-
-        System.out.println("Checkpoint 3");
-        
-        Future<UUID> resultA = executor.submit(userOneAddItemToCart);
-        Future<UUID> resultB = executor.submit(userTwoAddItemToCart);
-
-         try {
-            resultA.get();
-            resultB.get();
-
-        } catch (InterruptedException e) {
-            fail("should not throw {} ", e);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            fail("actually you should throw this execution exception");
-        }
-
-        System.out.println("Checkpoint 4");
-        
-        executor.shutdown();
-
-    }
-*/
 
 }
