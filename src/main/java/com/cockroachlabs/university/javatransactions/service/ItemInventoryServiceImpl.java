@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cockroachlabs.university.javatransactions.dao.ItemDao;
 
-import io.github.resilience4j.retry.annotation.Retry;
-
 @Component(value = "itemInventoryService")
 public class ItemInventoryServiceImpl implements ItemInventoryService {
 
