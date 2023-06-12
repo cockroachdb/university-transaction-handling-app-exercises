@@ -41,7 +41,6 @@ public interface ItemDao {
         findItemById(itemId);
 
         try {
-            System.out.println("UDPATE THE ITEM NOW! ");
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block

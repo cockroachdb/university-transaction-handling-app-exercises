@@ -25,7 +25,6 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException {
-        System.out.println("updateItemInventory(UUID itemId, int quantity) RUNNING");
 
         int maxRetries = 3;
         int retryDelay = 1000;
@@ -35,7 +34,6 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         while (retryTransaction) {
             try {
-                System.out.println(String.format("RUNNING UPDATE ITEM INVENTORY COUNT = %d", retryCount));
                 // to ensure a new transaction is created on every retry
                 this.updateItemInventoryTxn(itemId, quantity);
                 retryTransaction = false;
@@ -43,11 +41,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
                 Throwable cause = exception.getCause();
 
-                System.out.println(String.format("THIS IS THE CAUSE  %s", cause.toString()));
-
                 if (cause instanceof PSQLException) {
                     PSQLException psqlException = (PSQLException) cause;
-                    System.out.println(String.format("THIS IS THE SQL State  %s", psqlException.getSQLState()));
 
                     if ("40001".equals(psqlException.getSQLState())) {
                         retryCount++;
