@@ -25,18 +25,21 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException {
+      boolean retryTransaction = true;
 
+        /*
         int maxRetries = 3;
         int retryDelay = 1000;
         int retryCount = 0;
 
-        boolean retryTransaction = true;
-
+  
         while (retryTransaction) {
             try {
+                 */
                 // to ensure a new transaction is created on every retry
                 this.updateItemInventoryTxn(itemId, quantity);
                 retryTransaction = false;
+/*
             } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException exception) {
 
                 Throwable cause = exception.getCause();
@@ -62,6 +65,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
             }
             
         }
+         */
     }
 
 }
