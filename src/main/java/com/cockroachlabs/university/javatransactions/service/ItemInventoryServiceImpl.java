@@ -14,6 +14,27 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     private ItemDao itemDao;
 
+    private Boolean isRetryError (Exception exception) {
+
+        Throwable cause = exception.getCause();  // need to check and see if this is a retry error
+
+        Boolean passedErrorChecks = false;
+        if (cause instanceof PSQLException) {  // *might* be a retry error
+
+                PSQLException psqlException = (PSQLException) cause;
+
+                if ("40001".equals(psqlException.getSQLState())) {  // RETRY ERROR!
+
+                    passedErrorChecks = true;
+
+                }
+
+            } 
+        
+        return passedErrorChecks;
+
+    }
+
     public ItemInventoryServiceImpl(ItemDao itemDao) {
         this.itemDao = itemDao;
     }
@@ -26,19 +47,28 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException {
 
-        // Use these when implementing additional functionality
-        int maxRetries = 3;
-        int retryDelay = 1000;
-        int retryCount = 0;
-
         // EXERCISE SECTION
         // THIS IS WHERE YOU WILL MODIFY THE CODE:
+        try {
 
-        // This line runs the transaction, initially with no retry logic:
-        this.updateItemInventoryTxn(itemId, quantity);
+            // Perform the transaction
+            this.updateItemInventoryTxn(itemId, quantity);
 
+        } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException exception) {
+
+            if (isRetryError(exception) == true ) {
+
+                this.updateItemInventoryTxn(itemId, quantity);
+
+            } else {  // Not a retry error
+
+                throw exception;
+
+            }
+        
+        }
         // END OF EXERCISE SECTION
+
     }
 
 }
-
