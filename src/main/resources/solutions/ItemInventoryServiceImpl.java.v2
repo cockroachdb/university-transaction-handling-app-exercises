@@ -49,27 +49,40 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         // EXERCISE SECTION
         // THIS IS WHERE YOU WILL MODIFY THE CODE:
-        try {
+        // Included is a possible implementation of a basic retry loop
+        int maxRetries = 3;
+        int retryCount = 1;
 
-            // Perform the transaction
-            this.updateItemInventoryTxn(itemId, quantity);
+        while (retryCount <= maxRetries) {
 
-        } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException exception) {
+            try {
 
-            if (isRetryError(exception) == true ) {
+                retryCount++;
+                // Perform the transaction
+                this.updateItemInventoryTxn(itemId, quantity);
 
-                // Since it's a retry error but it will not be retried, log that the retry limit was exceeded.
-                System.out.printf("[WARNING]: Retry error caught in `updateItemInventory` but retry limit exceeded.");
+            } catch (org.jdbi.v3.core.statement.UnableToExecuteStatementException exception) {
 
-            } else {  // Not a retry error
+                if (isRetryError(exception) == true ) {
 
-                throw exception;
+                    continue;
 
+                } else {  // Not a retry error
+
+                    throw exception;
+
+                }
+            
             }
-        
+
         }
+
+        // Since it's a retry error but it will not be retried, log that the retry limit was exceeded.
+        System.out.printf("[WARNING]: Retry error caught in `updateItemInventory` but retry limit exceeded.");
+
         // END OF EXERCISE SECTION
 
     }
 
 }
+
