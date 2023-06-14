@@ -41,9 +41,11 @@ public interface ItemDao {
         findItemById(itemId);
 
         try {
+            // Used in test scenario to trigger contention
+            // This sleep() call wouldn't be present in a production
+            // environment
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         updateItemQuantity(itemId, quantity);
