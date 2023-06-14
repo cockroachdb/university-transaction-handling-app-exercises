@@ -26,13 +26,19 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException {
 
-      boolean retryTransaction = true;
+        // Use these when implementing additional functionality
+        int maxRetries = 3;
+        int retryDelay = 1000;
+        int retryCount = 0;
 
-      // THIS IS WHERE YOU WILL MODIFY THE CODE
-      // Initially, the transaction is performed with no error handling.
-      this.updateItemInventoryTxn(itemId, quantity);
-      retryTransaction = false;
+        // EXERCISE SECTION
+        // THIS IS WHERE YOU WILL MODIFY THE CODE:
 
+        // This line runs the transaction, initially with no retry logic:
+        this.updateItemInventoryTxn(itemId, quantity);
+
+        // END OF EXERCISE SECTION
     }
 
 }
+
