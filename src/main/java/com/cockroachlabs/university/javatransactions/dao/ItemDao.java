@@ -12,11 +12,15 @@ import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import org.springframework.boot.logging.LoggingSystemFactory;
 
 import com.cockroachlabs.university.javatransactions.domain.Item;
 
+
 @UseClasspathSqlLocator
 public interface ItemDao {
+
+    org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ItemDao.class);
 
     @SqlUpdate("insertItem")
     @GetGeneratedKeys
@@ -36,18 +40,14 @@ public interface ItemDao {
     int updateItemQuantity(@Bind("item_id") UUID itemId, @Bind("amount") int amount);
 
     @Transaction
-    default void updateItemInventory(UUID itemId, int quantity) throws SQLException {
-        
+    default void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
         findItemById(itemId);
 
-        try {
-            System.out.println("UDPATE THE ITEM NOW! ");
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        log.info("Artificial 5 second delay! Gives time for another transaction to happen while this is still open");
+        Thread.sleep(5000);
+        
         updateItemQuantity(itemId, quantity);
 
     }
+
 }
