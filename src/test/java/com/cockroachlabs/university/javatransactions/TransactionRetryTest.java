@@ -105,16 +105,16 @@ public class TransactionRetryTest {
         Exception expectedException = assertThrows(RuntimeException.class, () -> {
 
         
-        doThrow(exception).when(itemDao).updateItemInventory(itemId, quantity);
+            doThrow(exception).when(itemDao).updateItemInventory(itemId, quantity);
         
-        itemInventoryServiceImpl.updateItemInventory(itemId, quantity);
+            itemInventoryServiceImpl.updateItemInventory(itemId, quantity);
     
         });
            
         String message = expectedException.getMessage();
         assertTrue("Max retries exceeded".equalsIgnoreCase(message), "We exceeded the maximum retries as expected");
 
-        verify(itemDao, times(4)).updateItemInventory(itemId, quantity);
+        verify(itemDao, times(5)).updateItemInventory(itemId, quantity);
         
     }
     
