@@ -65,7 +65,7 @@ public class SpringBootJdbiApplicationIntegrationTest {
     }
 
     @Test
-    public void givenExistingItem_WhenInventoryUpdated_thenSuccess() {
+    public void givenExistingItem_WhenInventoryUpdated_thenSuccess() throws SQLException, InterruptedException {
         assertNotNull(itemDao);
         
         Item item = Item.builder().name("foo")
@@ -76,18 +76,14 @@ public class SpringBootJdbiApplicationIntegrationTest {
         UUID generatedId = itemDao.insertItem(item);
 
         assertNotNull(generatedId);
-
-        try {
-            itemDao.updateItemInventory(generatedId, 3);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            fail(String.format("Should not reach exception: %s ", e.getMessage()));
-        }
+        
+        itemDao.updateItemInventory(generatedId, 3);
+        
 
     }
 
     @Test
-    public void givenItemUpdatedWhileTransactionOpen_shouldthrowRetryError() {
+    public void givenItemUpdatedWhileTransactionOpen_shouldthrowRetryError() throws InterruptedException, ExecutionException {
         assertNotNull(itemDao);
         
         Item item = Item.builder().name("foo")
@@ -127,26 +123,18 @@ public class SpringBootJdbiApplicationIntegrationTest {
         Future<Boolean> a = executor.submit(updateItemInventory);
         Future<Boolean> b = executor.submit(updateItem);
 
-        try {
-            Boolean updatedInventory = a.get();
-            Boolean updatedItemQuanity = b.get();
+        
+        Boolean updatedInventory = a.get();
+        Boolean updatedItemQuanity = b.get();
 
-            assertTrue(updatedInventory, "successfully updated inventory");
-            assertTrue(updatedItemQuanity, "successfully updated the item quantity");
+        assertTrue(updatedInventory, "successfully updated inventory");
+        assertTrue(updatedItemQuanity, "successfully updated the item quantity");
 
-            int updatedQuanity = itemDao.findItemById(generatedId).getQuantity();
-            log.info(String.format("Updated item quantity is: %d", updatedQuanity));
+        int updatedQuanity = itemDao.findItemById(generatedId).getQuantity();
+        log.info(String.format("Updated item quantity is: %d", updatedQuanity));
 
-            assertTrue(itemDao.findItemById(generatedId).getQuantity() == 195);
+        assertTrue(itemDao.findItemById(generatedId).getQuantity() == 195);
 
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    } 
+    }       
 
 }
