@@ -72,7 +72,6 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         // Initialize some parameters for the retry logic
         int maxRetries = 3; //retry a maximum of 3 times
-        int retryDelay = 1000; //delay parameter for exponential backoff (milliseconds)
         int retryCount = 0; //keep track of how many times we've retried the transaction
 
         // We will execute the update in a while loop. "retryTransaction" is
@@ -103,14 +102,6 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                         throw new RuntimeException("Max retries exceeded", exception);
 
                     } else {
-
-                        // We don't want to keep retrying right away as that could overload the system
-                        // Instead, use exponential backoff to set the retry delay interval
-                        int delay = (int) (retryDelay * Math.pow(2, retryCount));
-                        log.info(String.format("On retry #%d waiting %d milliseconds", retryCount, delay));
-
-                        // Wait for the delay period before retrying
-                        Thread.sleep(delay);
 
                         // Increment retryCount by 1
                         retryCount++; 
