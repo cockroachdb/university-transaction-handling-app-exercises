@@ -70,6 +70,9 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
+        // BEGINNING OF EXERCISE
+        // YOU WILL MOIDFY THE CODE BETWEEN HERE AND THE COMMENT, `// END OF EXERCISE`
+
         try {
             log.info("Attempting item inventory update... "); 
             
@@ -93,6 +96,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
             throw exception;
 
         }
+
+        // END OF EXERCISE; DO NOT MODIFY BEYOND THIS POINT
 
     }
 

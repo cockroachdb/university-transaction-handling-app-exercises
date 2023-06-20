@@ -103,13 +103,12 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
                     } else {
 
-                        // Increment retryCount by 1
+                        // Increment retryCount by 1, then go 
+                        // back to the start of the loop
                         retryCount++; 
+                        continue;
 
                     }
-
-                     // Back to the beginning of the while loop
-                    continue;
 
                 }
 
