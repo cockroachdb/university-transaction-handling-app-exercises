@@ -71,7 +71,10 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
         // BEGINNING OF EXERCISE
-        // YOU WILL MOIDFY THE CODE BETWEEN HERE AND THE COMMENT, `// END OF EXERCISE`
+        // YOU WILL MODIDFY ONLY THIS `updateItemInventory` METHOD
+
+        // STEP 1: INITIALIZE ANY PARAMETERS YOU PLAN TO USE FOR THE LOOP,
+        //         THEN WRAP THE FOLLOWING IN A RETRY LOOP.
 
         try {
             log.info("Attempting item inventory update... "); 
@@ -79,26 +82,35 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
             // to ensure a new transaction is created on every retry
             this.updateItemInventoryTxn(itemId, quantity);
 
-            // if the update succeeds, break out of the while loop
+            // STEP 1: AFTER WRAPPING THIS CLAUSE IN A LOOP,
+            //         YOU MAY NEED TO BREAK OUT OF THE LOOP HERE
 
         } catch (UnableToExecuteStatementException exception) {
             
             // Since we've caught an UnableToExecuteStatementException,
             // confirm that this is, in fact, a retry error;
             if (this.isRetryError(exception)) {
-                     
-                 // Throw a RuntimeException exception telling users "Max retries exceeded"
-                 throw new RuntimeException("Max retries exceeded", exception);
+                
+                // INITIALLY, THIS WILL SIMPLY THROW THE EXCEPTION
+                // WRAP THIS IN A CHECK TO ENSURE THAT THE RETRIES HAVE BEEN
+                // EXCEEDED BEFORE THROWING
+
+                // Throw a RuntimeException exception telling users "Max retries exceeded"
+                throw new RuntimeException("Max retries exceeded", exception);
+
+            } else {
+
+                // if it wasn't a retry error, re-throw the exception
+                throw exception;
 
             }
 
-            // if it wasn't a retry error, don't catch it
-            throw exception;
+            // STEP 1: PERFORM ANY BOOKKEEPING FOR THE RETRY LOOP HERE
+            //         SUCH AS INCREMENTING A COUNTER
 
         }
 
-        // END OF EXERCISE; DO NOT MODIFY BEYOND THIS POINT
-
     }
+    // END OF EXERCISE; DO NOT MODIFY BEYOND THIS POINT
 
 }

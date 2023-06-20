@@ -70,9 +70,11 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
-        // Initialize some parameters for the retry logic
-        int maxRetries = 3; //retry a maximum of 3 times
-        int retryCount = 0; //keep track of how many times we've retried the transaction
+        // BEGINNING OF EXERCISE
+        
+        // INITIALIZE SOME PARAMETERS FOR INITIAL RETRY LOGIC
+        int maxRetries = 3; // Retry a maximum of 3 times
+        int retryCount = 0; // Keep track of how many times we've retried the transaction
 
         // We will execute the update in a while loop. "retryTransaction" is
         // the control variable for the while loop. 
@@ -84,6 +86,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                 
                 // to ensure a new transaction is created on every retry
                 this.updateItemInventoryTxn(itemId, quantity);
+		
+		// ADDED THE FOLLOWING TO STOP WHEN THE UDPATE SUCCEEDED
                 // if the update succeeds, break out of the while loop
                 retryTransaction = false;
 
@@ -94,6 +98,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                 // if so, proceed with retry logic
                 if (this.isRetryError(exception)) {
                          
+	            // ADDED THE FOLLOWING CHECK TO SEE IF MAX RETRIES EXCEEDED:
                     // Once we get to the max number of retries, we want to throw an exception
                     // Otherwise, we want to sleep, and increment the count
                     if (retryCount > maxRetries) {
@@ -103,6 +108,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
                     } else {
 
+                        // ADDED THE FOLLOWING BOOKKEEPING LOGIC
                         // Increment retryCount by 1, then go 
                         // back to the start of the loop
                         retryCount++; 
