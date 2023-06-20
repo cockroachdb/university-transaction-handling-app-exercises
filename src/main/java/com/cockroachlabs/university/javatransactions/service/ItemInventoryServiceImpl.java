@@ -42,7 +42,9 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         while (retryTransaction) {
             try {
-                log.info("Attempting item inventory update... ");                // to ensure a new transaction is created on every retry
+                log.info("Attempting item inventory update... "); 
+                
+                // to ensure a new transaction is created on every retry
                 this.updateItemInventoryTxn(itemId, quantity);
 
                 // if the update succeeds, break out of the while loop
@@ -78,20 +80,21 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                         // Increment retryCount by 1 
                         retryCount++; 
 
-                        // We don't want to keep retrying right away as that could overload the system
-                        // Instead, use an exponential backoff to set the retry delay interval
-                        int delay = (int) (retryDelay * Math.pow(2, retryCount));
-                    
-                        log.info(String.format("On retry #%d waiting %d milliseconds", retryCount, delay));
-                        // Wait for the delay period before retrying
-                        Thread.sleep(delay);
-                        
                         // Once we get to the max number of retries, we want to throw an exception
-                        if (retryCount == maxRetries) {
+                        if (retryCount > maxRetries) {
                             // Throw a RuntimeException exception telling users "Max retries exceeded"
                             throw new RuntimeException("Max retries exceeded", exception);
+                        } else {
+
+                            // We don't want to keep retrying right away as that could overload the system
+                            // Instead, use an exponential backoff to set the retry delay interval
+                            int delay = (int) (retryDelay * Math.pow(2, retryCount));
+                        
+                            log.info(String.format("On retry #%d waiting %d milliseconds", retryCount, delay));
+                            // Wait for the delay period before retrying
+                            Thread.sleep(delay);
                         }
-                        // Back to the beginning of the while loop
+                         // Back to the beginning of the while loop
                         continue;
                     }
                 }
