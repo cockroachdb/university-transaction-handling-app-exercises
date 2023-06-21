@@ -71,10 +71,17 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
+        // BEGINNING OF EXERCISES
+        // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
+        // LOOK FOR COMMENTS IN ALL CAPS TO GUIDE YOU IN MODIFYING
+        // THE CODE LOGIC
+
+        // EXERCISE 5: PARAMETERS BELOW HAVE BEEN INITIALIZED
+        //             YOU MAY NEED TO MODIFY THEM FURTHER (OR ADD NEW
+        //             PARAMETERS IF YOU NEED THEM)
         // Initialize parameters
         int maxRetries = 3;  // Set maximum number of retries
         int retryCount = 0;  // Use this to track which retry we're on (start at 0)
-        int retryDelay = 1000; // Delay parameter for exponential backoff (milliseconds)
 
         while (true) {
 
@@ -101,13 +108,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
                     } else {  // Otherwise, increment the counter and try again
 
-                        // UPDATED FOR EXERCISE 5 SOLUTION
-                        // We don't want to keep retrying right away as that could overload the system
-                        // Instead, use exponential backoff to set the retry delay interval
-                        int delay = (int) (retryDelay * Math.pow(2, retryCount));
+                        // EXERCISE 5: ADD EXPONENTIAL BACKOFF LOGIC HERE
 
-                        // Wait for the delay period before retrying
-                        Thread.sleep(delay);
 
                         // Increment the retry counter
                         retryCount++;
