@@ -12,6 +12,9 @@
 .idea/**/dictionaries
 .idea/**/shelf
 
+# Vim
+.*.swp
+
 # AWS User-specific
 .idea/**/aws.xml
 
