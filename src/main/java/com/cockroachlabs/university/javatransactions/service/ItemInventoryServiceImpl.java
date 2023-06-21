@@ -71,55 +71,57 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
+        // BEGINNING OF EXERCISES 4 AND 5
+        // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
+
         // EXERCISES 4 AND 5: PARAMETERS BELOW HAVE BEEN INITIALIZED
         //                    YOU MAY NEED TO MODIFY THEM FURTHER (OR ADD NEW
         //                    PARAMETERS) FOR THIS EXERCISE
-        // Initialize parameters
-        int maxRetries = 3;  // Set maximum number of retries
+        int maxRetries = -1;  // Set maximum number of retries
         int retryCount = 0;  // Use this to track which retry we're on (start at 0)
 
-        while (true) {
+        // EXERCISE 4: WRAP THE FOLLOWING try/catch BLOCK IN A LOOP TO
+        //             RETRY THE TRANSACTION
 
-            try {
+        try {
 
-                // First, attempt the transaction
-                this.updateItemInventoryTxn(itemId, quantity);
-                // The transaction worked! Time to exit!
-                return;
+            // First, attempt the transaction
+            this.updateItemInventoryTxn(itemId, quantity);
+            // The transaction worked! Time to exit!
+            return;
 
-            } catch (UnableToExecuteStatementException exception) {
-                // Caught an UnableToExecuteStatementException
+        } catch (UnableToExecuteStatementException exception) {
+            // Caught an UnableToExecuteStatementException
 
-                // First, verify that this is actually a retry error:
-                if (this.isRetryError(exception)) {
+            // First, verify that this is actually a retry error:
+            if (this.isRetryError(exception)) {
 
-                    // Check to see if we've exceeded our allowable retries
-                    // If you haven't modified anything, this will occur if even
-                    // one retry error is caught
-                    if (retryCount > maxRetries) {
+                // Check to see if we've exceeded our allowable retries
+                // If you haven't modified anything, this will occur if even
+                // one retry error is caught
+                if (retryCount > maxRetries) {
 
-                        // Throw a RuntimeException 
-                        throw new RuntimeException("Max retries exceeded", exception);
+                    // Throw a RuntimeException 
+                    throw new RuntimeException("Max retries exceeded", exception);
 
-                    } else {  // Otherwise, increment the counter and try again
+                } else {  // Otherwise, increment the counter and try again
 
-                        // EXERCISE 5: ADD EXPONENTIAL BACKOFF LOGIC HERE
+                    // EXERCISE 4: NO ACTION NEEDED HERE
+                    // EXERCISE 5: ADD EXPONENTIAL BACKOFF LOGIC HERE
 
-                        // Increment the retry counter
-                        retryCount++;
-
-                    }
-
-                } else {  // Not a retry error! Just re-throw the caught exception
-
-                    throw exception;
+                    // Increment the retry counter
+                    retryCount++;
 
                 }
 
-            }  // End of catch block
-                
-        }  // End of while block
+            } else {  // Not a retry error! Just re-throw the caught exception
 
-    } // END OF EXERCISE; DO NOT MODIFY ANYTHING BEYOND THIS POINT
+                throw exception;
+
+            }
+
+        }  // End of catch block
+
+    } // END OF EXERCISES; DO NOT MODIFY ANYTHING BEYOND THIS POINT
 
 }
