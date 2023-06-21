@@ -71,9 +71,14 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
-        // EXERCISES 4 AND 5: PARAMETERS BELOW HAVE BEEN INITIALIZED
-        //                    YOU MAY NEED TO MODIFY THEM FURTHER (OR ADD NEW
-        //                    PARAMETERS) FOR THIS EXERCISE
+        // BEGINNING OF EXERCISES
+        // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
+        // LOOK FOR COMMENTS IN ALL CAPS TO GUIDE YOU IN MODIFYING
+        // THE CODE LOGIC
+
+        // EXERCISE 5: PARAMETERS BELOW HAVE BEEN INITIALIZED
+        //             YOU MAY NEED TO MODIFY THEM FURTHER (OR ADD NEW
+        //             PARAMETERS IF YOU NEED THEM)
         // Initialize parameters
         int maxRetries = 3;  // Set maximum number of retries
         int retryCount = 0;  // Use this to track which retry we're on (start at 0)
@@ -96,7 +101,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                     // Check to see if we've exceeded our allowable retries
                     // If you haven't modified anything, this will occur if even
                     // one retry error is caught
-                    if (retryCount > maxRetries) {
+                    if (retryCount >= maxRetries) {
 
                         // Throw a RuntimeException 
                         throw new RuntimeException("Max retries exceeded", exception);
@@ -104,6 +109,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                     } else {  // Otherwise, increment the counter and try again
 
                         // EXERCISE 5: ADD EXPONENTIAL BACKOFF LOGIC HERE
+
 
                         // Increment the retry counter
                         retryCount++;

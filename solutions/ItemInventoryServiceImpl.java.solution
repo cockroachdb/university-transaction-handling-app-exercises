@@ -72,7 +72,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
         // Initialize parameters
-        int maxRetries = 3;  // Set maximum number of retries;
+        int maxRetries = 3;  // Set maximum number of retries
         int retryCount = 0;  // Use this to track which retry we're on (start at 0)
         int retryDelay = 1000; // Delay parameter for exponential backoff (milliseconds)
 
@@ -94,7 +94,7 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
                     // Check to see if we've exceeded our allowable retries
                     // If you haven't modified anything, this will occur if even
                     // one retry error is caught
-                    if (retryCount > maxRetries) {
+                    if (retryCount >= maxRetries) {
 
                         // Throw a RuntimeException 
                         throw new RuntimeException("Max retries exceeded", exception);
