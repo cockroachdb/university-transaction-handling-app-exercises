@@ -22,7 +22,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     private boolean isRetryError(UnableToExecuteStatementException exception) {
 
-        // We've caught the UnableToExecuteStatementException
+        // Helper function. 
+        // Once we've caught the UnableToExecuteStatementException,
         // We'll check the cause to determine if it's a retry error
         Throwable cause = exception.getCause(); 
         log.error(String.format("ENCOUNTERED  %s", cause.toString()));
@@ -70,61 +71,59 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
-        // BEGINNING OF EXERCISE
-        
-        // INITIALIZE SOME PARAMETERS FOR INITIAL RETRY LOGIC
-        int maxRetries = 3; // Retry a maximum of 3 times
-        int retryCount = 0; // Keep track of how many times we've retried the transaction
+        // Initialize parameters
+        int maxRetries = 3;  // Set maximum number of retries;
+        int retryCount = 0;  // Use this to track which retry we're on (start at 0)
+        int retryDelay = 1000; // Delay parameter for exponential backoff (milliseconds)
 
-        // We will execute the update in a while loop. "retryTransaction" is
-        // the control variable for the while loop. 
-        boolean retryTransaction = true;
+        while (true) {
 
-        while (retryTransaction) {
             try {
-                log.info("Attempting item inventory update... "); 
-                
-                // to ensure a new transaction is created on every retry
+
+                // First, attempt the transaction
                 this.updateItemInventoryTxn(itemId, quantity);
-		
-		// ADDED THE FOLLOWING TO STOP WHEN THE UDPATE SUCCEEDED
-                // if the update succeeds, break out of the while loop
-                retryTransaction = false;
+                // The transaction worked! Time to exit!
+                return;
 
             } catch (UnableToExecuteStatementException exception) {
-                
-                // Since we've caught an UnableToExecuteStatementException,
-                // confirm that this is, in fact, a retry error;
-                // if so, proceed with retry logic
+                // Caught an UnableToExecuteStatementException
+
+                // First, verify that this is actually a retry error:
                 if (this.isRetryError(exception)) {
-                         
-	            // ADDED THE FOLLOWING CHECK TO SEE IF MAX RETRIES EXCEEDED:
-                    // Once we get to the max number of retries, we want to throw an exception
-                    // Otherwise, we want to sleep, and increment the count
+
+                    // Check to see if we've exceeded our allowable retries
+                    // If you haven't modified anything, this will occur if even
+                    // one retry error is caught
                     if (retryCount > maxRetries) {
 
-                        // Throw a RuntimeException exception telling users "Max retries exceeded"
+                        // Throw a RuntimeException 
                         throw new RuntimeException("Max retries exceeded", exception);
 
-                    } else {
+                    } else {  // Otherwise, increment the counter and try again
 
-                        // ADDED THE FOLLOWING BOOKKEEPING LOGIC
-                        // Increment retryCount by 1, then go 
-                        // back to the start of the loop
-                        retryCount++; 
-                        continue;
+                        // UPDATED FOR EXERCISE 5 SOLUTION
+                        // We don't want to keep retrying right away as that could overload the system
+                        // Instead, use exponential backoff to set the retry delay interval
+                        int delay = (int) (retryDelay * Math.pow(2, retryCount));
+
+                        // Wait for the delay period before retrying
+                        Thread.sleep(delay);
+
+                        // Increment the retry counter
+                        retryCount++;
 
                     }
 
+                } else {  // Not a retry error! Just re-throw the caught exception
+
+                    throw exception;
+
                 }
 
-                // if it wasn't a retry error, don't catch it
-                throw exception;
+            }  // End of catch block
+                
+        }  // End of while block
 
-            }
-            
-        }
-
-    }
+    } // END OF EXERCISE; DO NOT MODIFY ANYTHING BEYOND THIS POINT
 
 }

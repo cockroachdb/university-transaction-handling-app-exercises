@@ -22,7 +22,8 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     private boolean isRetryError(UnableToExecuteStatementException exception) {
 
-        // We've caught the UnableToExecuteStatementException
+        // Helper function. 
+        // Once we've caught the UnableToExecuteStatementException,
         // We'll check the cause to determine if it's a retry error
         Throwable cause = exception.getCause(); 
         log.error(String.format("ENCOUNTERED  %s", cause.toString()));
@@ -70,47 +71,55 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
 
-        // BEGINNING OF EXERCISE
-        // YOU WILL MODIDFY ONLY THIS `updateItemInventory` METHOD
+        // EXERCISES 4 AND 5: PARAMETERS BELOW HAVE BEEN INITIALIZED
+        //                    YOU MAY NEED TO MODIFY THEM FURTHER (OR ADD NEW
+        //                    PARAMETERS) FOR THIS EXERCISE
+        // Initialize parameters
+        int maxRetries = 3;  // Set maximum number of retries
+        int retryCount = 0;  // Use this to track which retry we're on (start at 0)
 
-        // STEP 1: INITIALIZE ANY PARAMETERS YOU PLAN TO USE FOR THE LOOP,
-        //         THEN WRAP THE FOLLOWING IN A RETRY LOOP.
+        while (true) {
 
-        try {
-            log.info("Attempting item inventory update... "); 
-            
-            // to ensure a new transaction is created on every retry
-            this.updateItemInventoryTxn(itemId, quantity);
+            try {
 
-            // STEP 1: AFTER WRAPPING THIS CLAUSE IN A LOOP,
-            //         YOU MAY NEED TO BREAK OUT OF THE LOOP HERE
+                // First, attempt the transaction
+                this.updateItemInventoryTxn(itemId, quantity);
+                // The transaction worked! Time to exit!
+                return;
 
-        } catch (UnableToExecuteStatementException exception) {
-            
-            // Since we've caught an UnableToExecuteStatementException,
-            // confirm that this is, in fact, a retry error;
-            if (this.isRetryError(exception)) {
+            } catch (UnableToExecuteStatementException exception) {
+                // Caught an UnableToExecuteStatementException
+
+                // First, verify that this is actually a retry error:
+                if (this.isRetryError(exception)) {
+
+                    // Check to see if we've exceeded our allowable retries
+                    // If you haven't modified anything, this will occur if even
+                    // one retry error is caught
+                    if (retryCount > maxRetries) {
+
+                        // Throw a RuntimeException 
+                        throw new RuntimeException("Max retries exceeded", exception);
+
+                    } else {  // Otherwise, increment the counter and try again
+
+                        // EXERCISE 5: ADD EXPONENTIAL BACKOFF LOGIC HERE
+
+                        // Increment the retry counter
+                        retryCount++;
+
+                    }
+
+                } else {  // Not a retry error! Just re-throw the caught exception
+
+                    throw exception;
+
+                }
+
+            }  // End of catch block
                 
-                // INITIALLY, THIS WILL SIMPLY THROW THE EXCEPTION
-                // WRAP THIS IN A CHECK TO ENSURE THAT THE RETRIES HAVE BEEN
-                // EXCEEDED BEFORE THROWING
+        }  // End of while block
 
-                // Throw a RuntimeException exception telling users "Max retries exceeded"
-                throw new RuntimeException("Max retries exceeded", exception);
-
-            } else {
-
-                // if it wasn't a retry error, re-throw the exception
-                throw exception;
-
-            }
-
-            // STEP 1: PERFORM ANY BOOKKEEPING FOR THE RETRY LOOP HERE
-            //         SUCH AS INCREMENTING A COUNTER
-
-        }
-
-    }
-    // END OF EXERCISE; DO NOT MODIFY BEYOND THIS POINT
+    } // END OF EXERCISE; DO NOT MODIFY ANYTHING BEYOND THIS POINT
 
 }
