@@ -33,14 +33,12 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         // BEGINNING OF EXERCISE
         // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
-        // LOOK FOR COMMENTS IN ALL CAPS TO GUIDE YOU IN MODIFYING
-        // THE CODE LOGIC
 
-        int maxRetries = 0;  // Set maximum number of retries
+        int maxRetries = 0;  // TODO: Set maximum number of retries
         int retryCount = 0;  // Use this to track which retry we're on (start at 0)
 
-        // WRAP THE FOLLOWING try/catch BLOCK IN A LOOP TO
-        // RETRY THE TRANSACTION
+        // TODO: WRAP THE FOLLOWING try/catch BLOCK IN A LOOP TO
+        //       RETRY THE TRANSACTION
 
         try {
 
