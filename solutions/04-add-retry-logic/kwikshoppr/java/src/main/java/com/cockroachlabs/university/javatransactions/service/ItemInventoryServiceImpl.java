@@ -33,8 +33,6 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
         // BEGINNING OF EXERCISES
         // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
-        // LOOK FOR COMMENTS IN ALL CAPS TO GUIDE YOU IN MODIFYING
-        // THE CODE LOGIC
 
         // Initialize parameters
         int maxRetries = 3;  // Set maximum number of retries
