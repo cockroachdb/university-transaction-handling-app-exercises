@@ -30,53 +30,10 @@ public class ItemInventoryServiceImpl implements ItemInventoryService {
 
     @Override
     public void updateItemInventory(UUID itemId, int quantity) throws SQLException, InterruptedException {
+        // TODO: This will be implemented as part of exercises 4 & 5
 
-        // BEGINNING OF EXERCISE
-        // YOU WILL ONLY MODIFY THIS `updateItemInventory` METHOD
-
-        int maxRetries = 0;  // TODO: Set maximum number of retries
-        int retryCount = 0;  // Use this to track which retry we're on (start at 0)
-
-        // TODO: WRAP THE FOLLOWING try/catch BLOCK IN A LOOP TO
-        //       RETRY THE TRANSACTION
-
-        try {
-
-            // First, attempt the transaction
-            this.updateItemInventoryTxn(itemId, quantity);
-            // The transaction worked! Time to exit!
-            return;
-
-        } catch (UnableToExecuteStatementException exception) {
-            // Caught an UnableToExecuteStatementException
-
-            // First, verify that this is actually a retry error:
-            if (this.isRetryError(exception)) {
-
-                // Check to see if we've exceeded our allowable retries
-                // If you haven't modified anything, this will occur if even
-                // one retry error is caught
-                if (retryCount >= maxRetries) {
-
-                    // Throw a RuntimeException 
-                    throw new RuntimeException("Max retries exceeded", exception);
-
-                } else {  // Otherwise, increment the counter and try again
-
-                    // Increment the retry counter
-                    retryCount++;
-
-                }
-
-            } else {  // Not a retry error! Just re-throw the caught exception
-
-                throw exception;
-
-            }
-
-        }  // End of catch block
-
-    } // END OF EXERCISE; DO NOT MODIFY ANYTHING BEYOND THIS POINT
+        throw new UnsupportedOperationException("Unimplemented method 'updateItemInventory'");
+    }
 
     private boolean isRetryError(UnableToExecuteStatementException exception) {
 
