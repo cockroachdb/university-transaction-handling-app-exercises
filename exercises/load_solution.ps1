@@ -17,7 +17,8 @@ if (!$EXERCISE) {
 }
 
 $SUB_FOLDERS = @(
-    "kwikshoppr/java"
+    "kwikshoppr/java", 
+	"kwikshoppr/sql"
 )
 
 $SOLUTION_FOLDER = "../solutions"

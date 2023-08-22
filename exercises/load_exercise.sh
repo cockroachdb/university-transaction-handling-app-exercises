@@ -21,7 +21,8 @@ then
 fi
 
 SUB_FOLDERS=(
-    "kwikshoppr/java"
+    "kwikshoppr/java", 
+    "kwikshoppr/sql"
 )
 
 SETUP_FOLDER=../setup
