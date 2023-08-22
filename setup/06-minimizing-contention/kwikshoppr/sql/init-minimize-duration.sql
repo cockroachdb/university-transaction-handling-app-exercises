@@ -1,7 +1,7 @@
 -- Drop tables if they exist
 DROP IF EXISTS products;
-DROP IF EXISTS orders;
 DROP IF EXISTS order_items;
+DROP IF EXISTS orders;
 
 -- Create tables
 CREATE TABLE products (
