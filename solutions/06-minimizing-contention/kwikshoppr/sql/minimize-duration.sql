@@ -13,5 +13,3 @@ UPDATE products
 SET stock_quantity = us.new_stock_quantity
 FROM UpdatedStock us
 WHERE products.product_id = us.product_id;
-
-SELECT product_name FROM UpdatedStock WHERE new_stock_quantity <= 0;
