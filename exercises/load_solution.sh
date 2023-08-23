@@ -45,10 +45,10 @@ do
 
     if [ ! -d $SOLUTION ]
     then
-        echo "WARNING: Unable to find tests for in the requested folder: $SOLUTION...skipping"
+        echo "WARNING: Unable to find solution files in the requested folder: $SOLUTION...skipping"
     fi
   
     rm -rf $EXERCISE
-    mkdir $EXERCISE
-    cp -rp $SOLUTION/. $EXERCISE/
+    mkdir -p $EXERCISE
+    cp -rp $SOLUTION/* $EXERCISE
 done
