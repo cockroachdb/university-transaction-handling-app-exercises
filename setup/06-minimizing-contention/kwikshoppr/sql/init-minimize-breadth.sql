@@ -1,7 +1,7 @@
 -- Drop tables if they exist
-DROP IF EXISTS orders;
-DROP IF EXISTS customers;
-DROP IF EXISTS audit_logs;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS audit_logs;
 
 -- Creating the tables
 CREATE TABLE customers (
