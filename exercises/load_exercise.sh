@@ -21,7 +21,7 @@ then
 fi
 
 SUB_FOLDERS=(
-    "kwikshoppr/java", 
+    "kwikshoppr/java"
     "kwikshoppr/sql"
 )
 
