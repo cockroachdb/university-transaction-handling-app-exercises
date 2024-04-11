@@ -21,8 +21,13 @@ class ItemInventoryService {
 
     void updateItemInventory(UUID itemId, int quantity) throws InterruptedException {
 
+        // TODO: Introduce a max constant of 3 and a retry counter
+
+        // TODO: Instead of looping unconditionally, only retry if you haven't exceeded the max
         while (true) {
             try {
+                // TODO: Increment the retry counter
+
                 itemRepository.reduceItemQuantity(itemId, quantity);
                 return;
             } catch (DataAccessException exception) {
@@ -35,6 +40,10 @@ class ItemInventoryService {
                      * error when you have too much contention in your workload.
                      */
                     log.error("ENCOUNTERED " + psqlException);
+
+                    // TODO: Calculate an exponential delay of 2^attempt * 100L milliseconds
+                    // TODO: and then Thead.sleep() that long.
+
                 } else {
                     throw exception;
                 }

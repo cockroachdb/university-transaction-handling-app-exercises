@@ -21,20 +21,25 @@ class ItemInventoryService {
 
     void updateItemInventory(UUID itemId, int quantity) throws InterruptedException {
 
-        while (true) {
+        int max = 3; // Maximum number of attempts
+        int attempt = 0; // Current attempt
+
+        while (attempt < max) {
             try {
+
+                attempt++;
+                log.info("Attempt " + attempt);
+
                 itemRepository.reduceItemQuantity(itemId, quantity);
+
                 return;
             } catch (DataAccessException exception) {
                 if (exception.getRootCause() instanceof PSQLException psqlException
                         && psqlException.getSQLState().equals("40001")) {
-                    /*
-                     * SQL State "40001" refers to RETRY_WRITE_TOO_OLD. This error occurs when a transaction A tries to write to a
-                     * row R, but another transaction B that was supposed to be serialized after A (i.e. had been assigned a
-                     * higher timestamp), has already written to that row R, and has already been committed. This is a common
-                     * error when you have too much contention in your workload.
-                     */
                     log.error("ENCOUNTERED " + psqlException);
+
+                    Thread.sleep((long) (Math.pow(2.0, attempt) * 100L));
+
                 } else {
                     throw exception;
                 }
