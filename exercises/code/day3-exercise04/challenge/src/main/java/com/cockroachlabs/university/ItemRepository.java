@@ -13,6 +13,8 @@ interface ItemRepository extends JpaRepository<Item, UUID> {
 
 	Logger log = LoggerFactory.getLogger(ItemRepository.class);
 
+	Item findByName(String name);
+
 	@Transactional
 	@Modifying
 	@Query("""

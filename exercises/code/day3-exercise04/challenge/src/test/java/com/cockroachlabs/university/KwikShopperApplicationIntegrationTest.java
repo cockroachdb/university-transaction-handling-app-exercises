@@ -33,13 +33,7 @@ public class KwikShopperApplicationIntegrationTest {
 	@Test
 	void multithreadedUpdatesShouldWork() throws ExecutionException, InterruptedException {
 
-		// given
-		Item item = new Item();
-		item.setName("foo");
-		item.setDescription("fang");
-		item.setQuantity(200);
-		Item savedItem = repository.saveAndFlush(item);
-		assertThat(savedItem.getItemId()).isNotNull();
+		Item savedItem = repository.findByName("foo");
 
 		Callable<Boolean> updateItemInventoryThroughService = () -> {
 
