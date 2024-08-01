@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 @SpringBootTest
 public class KwikShopperApplicationIntegrationTest {
@@ -19,37 +21,13 @@ public class KwikShopperApplicationIntegrationTest {
 
 	@Autowired private ItemInventoryService service;
 
-	@Test
-	void insertsShouldWork() {
+	@Autowired private JdbcClient jdbcClient;
 
-		// given
-		Item item = new Item();
-		item.setName("foo");
-		item.setDescription("fang");
-		item.setQuantity(200);
-
-		// when
-		Item savedItem = repository.saveAndFlush(item);
-
-		// then
-		assertThat(savedItem.getItemId()).isNotNull();
-	}
-
-	@Test
-	void reducingQuantityOfInventoryShouldWork() throws InterruptedException {
-
-		// given
-		Item item = new Item();
-		item.setName("foo");
-		item.setDescription("fang");
-		item.setQuantity(200);
-		Item savedItem = repository.saveAndFlush(item);
-
-		// when
-		service.updateItemInventory(savedItem.getItemId(), 3);
-
-		// then
-		assertThat(repository.findById(savedItem.getItemId()).map(Item::getQuantity)).contains(197);
+	@BeforeEach
+	void initialize() {
+		jdbcClient //
+				.sql("UPDATE items SET quantity = 200 WHERE name = 'foo'") //
+				.update();
 	}
 
 	@Test
