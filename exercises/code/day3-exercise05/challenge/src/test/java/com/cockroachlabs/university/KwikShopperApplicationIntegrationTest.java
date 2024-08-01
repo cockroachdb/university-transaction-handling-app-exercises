@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,13 @@ public class KwikShopperApplicationIntegrationTest {
 	@Autowired private ItemInventoryService service;
 
 	@Autowired private JdbcClient jdbcClient;
+
+	@BeforeEach
+	void initialize() {
+		jdbcClient //
+				.sql("UPDATE items SET quantity = 200 WHERE name = 'foo'") //
+				.update();
+	}
 
 	@Test
 	void multithreadedUpdatesShouldGiveUp() throws ExecutionException, InterruptedException {
