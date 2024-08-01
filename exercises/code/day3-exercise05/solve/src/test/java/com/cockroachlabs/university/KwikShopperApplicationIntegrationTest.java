@@ -1,103 +1,73 @@
 package com.cockroachlabs.university;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.concurrent.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 @SpringBootTest
 public class KwikShopperApplicationIntegrationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(KwikShopperApplicationIntegrationTest.class);
+	private static final Logger log = LoggerFactory.getLogger(KwikShopperApplicationIntegrationTest.class);
 
-    @Autowired
-    private ItemRepository repository;
+	@Autowired private ItemRepository repository;
 
-    @Autowired
-    private ItemInventoryService service;
+	@Autowired private ItemInventoryService service;
 
-    @Test
-    void insertsShouldWork() {
+	@Autowired private JdbcClient jdbcClient;
 
-        // given
-        Item item = new Item();
-        item.setName("foo");
-        item.setDescription("fang");
-        item.setQuantity(200);
+	@BeforeEach
+	void initialize() {
+		jdbcClient //
+				.sql("UPDATE items SET quantity = 200 WHERE name = 'foo'") //
+				.update();
+	}
 
-        // when
-        Item savedItem = repository.saveAndFlush(item);
+	@Test
+	void multithreadedUpdatesShouldGiveUp() throws ExecutionException, InterruptedException {
 
-        // then
-        assertThat(savedItem.getItemId()).isNotNull();
-    }
+		Item savedItem = repository.findByName("foo");
 
-    @Test
-    void reducingQuantityOfInventoryShouldWork() throws InterruptedException {
+		Callable<Boolean> updateItemInventoryThroughService = () -> {
 
-        // given
-        Item item = new Item();
-        item.setName("foo");
-        item.setDescription("fang");
-        item.setQuantity(200);
-        Item savedItem = repository.saveAndFlush(item);
+			service.updateItemInventory(savedItem.getItemId(), 3);
 
-        // when
-        service.updateItemInventory(savedItem.getItemId(), 3);
+			return true;
+		};
 
-        // then
-        assertThat(repository.findById(savedItem.getItemId()).map(Item::getQuantity)).contains(197);
-    }
+		Callable<Boolean> updateItemInventoryThroughRepository = () -> {
 
-    @Test
-    void multithreadedUpdatesShouldGiveUp() throws ExecutionException, InterruptedException {
+			log.info("Giving the other transaction time to start...");
+			Thread.sleep(1000);
 
-        // given
-        Item item = new Item();
-        item.setName("foo");
-        item.setDescription("fang");
-        item.setQuantity(200);
-        Item savedItem = repository.saveAndFlush(item);
-        assertThat(savedItem.getItemId()).isNotNull();
+			for (int i = 0; i < 10; i++) {
+				log.info("This transaction in thread '" + Thread.currentThread().getName()
+						+ "' is meant to disrupt the other transaction and force a retry.");
+				repository.updateItemByReducingQuantity(savedItem.getItemId(), 2);
+				Thread.sleep(1000);
+			}
 
-        Callable<Boolean> updateItemInventoryThroughService = () -> {
+			return true;
+		};
 
-            service.updateItemInventory(savedItem.getItemId(), 3);
+		// when
+		ExecutorService executor = Executors.newCachedThreadPool();
 
-            return true;
-        };
+		Future<Boolean> servicedBasedFuture = executor.submit(updateItemInventoryThroughService);
+		Future<Boolean> repositoryBasedFuture = executor.submit(updateItemInventoryThroughRepository);
 
-        Callable<Boolean> updateItemInventoryThroughRepository = () -> {
+		servicedBasedFuture.get();
+		repositoryBasedFuture.get();
 
-            log.info("Giving the other transaction time to start...");
-            Thread.sleep(1000);
-
-            for (int i=0; i<10; i++) {
-                log.info("This transaction in thread '" + Thread.currentThread().getName()
-                        + "' is meant to disrupt the other transaction and force a retry.");
-                repository.updateItemByReducingQuantity(savedItem.getItemId(), 2);
-                Thread.sleep(1000);
-            }
-
-            return true;
-        };
-
-        // when
-        ExecutorService executor = Executors.newCachedThreadPool();
-
-        Future<Boolean> servicedBasedFuture = executor.submit(updateItemInventoryThroughService);
-        Future<Boolean> repositoryBasedFuture = executor.submit(updateItemInventoryThroughRepository);
-
-        servicedBasedFuture.get();
-        repositoryBasedFuture.get();
-
-        // then
-        assertThat(repository.findById(savedItem.getItemId()).map(Item::getQuantity)).contains(180);
-    }
+		// then
+		assertThat(repository.findById(savedItem.getItemId()).map(Item::getQuantity)).contains(180);
+	}
 
 }
