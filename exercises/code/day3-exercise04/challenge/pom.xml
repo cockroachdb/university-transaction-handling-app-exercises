@@ -18,7 +18,7 @@
     <description>Cockroach University - CockroachDB with Spring Data JPA - Transactions - Day 3 - Exercise 4 Challenge</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
