@@ -11,11 +11,11 @@
     </parent>
 
     <groupId>com.cockroachlabs.university</groupId>
-    <artifactId>javatransactions-day3-exercise07-solution</artifactId>
+    <artifactId>javatransactions-day3-exercise08-challenge</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>cockroach-university-fundamentals-javatransactions-day3-exercise07-solution</name>
-    <description>Cockroach University - CockroachDB with Spring Data JPA - Transactions - Day 3 - Exercise 7 Solution</description>
+    <name>cockroach-university-fundamentals-javatransactions-day3-exercise08-challenge</name>
+    <description>Cockroach University - CockroachDB with Spring Data JPA - Transactions - Day 3 - Exercise 8 Challenge</description>
 
     <properties>
         <java.version>21</java.version>

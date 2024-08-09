@@ -1,11 +1,12 @@
 package com.cockroachlabs.university;
 
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -19,12 +20,15 @@ class BookService {
 
 	private final TransactionTemplate txTemplate;
 
-	private final JdbcClient jdbcClient;
+	private final EntityManager entityManager;
 
-	BookService(BookRepository repository, TransactionTemplate txTemplate, JdbcClient jdbcClient) {
+	// TODO: Add another field of type JdbcClient
+
+	// TODO: Inject a parameter of type JdbcClient and assign it to its field
+	BookService(BookRepository repository, TransactionTemplate txTemplate, EntityManager entityManager) {
 		this.repository = repository;
 		this.txTemplate = txTemplate;
-		this.jdbcClient = jdbcClient;
+		this.entityManager = entityManager;
 	}
 
 	@Transactional
@@ -65,8 +69,11 @@ class BookService {
 
 			if (!booksOnSale.isEmpty()) {
 
-				jdbcClient //
-						.sql("""
+				// TODO: Replace this JPA call with a JDBC client call using the exact same query.
+				// TODO: Be sure to configure the "books_on_sale" parameter with a copy of booksOnSale
+
+				entityManager //
+						.createNativeQuery("""
 								WITH original_prices AS (
 									SELECT book_id, price
 									FROM books_msrp
@@ -77,8 +84,8 @@ class BookService {
 								WHERE book.book_id = original_prices.book_id
 								AND book.book_id IN (:books_on_sale)
 								""") //
-						.param("books_on_sale", booksOnSale) //
-						.update();
+						.setParameter("books_on_sale", booksOnSale) //
+						.executeUpdate();
 
 				LOG.debug(">>> Canceled the sale on " + booksOnSale.size() + " books!");
 			} else {
